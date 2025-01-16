@@ -1062,6 +1062,10 @@ void CHyprOpenGLImpl::initShaders() {
     m_RenderData.pCurrentMonData->m_shBORDER1.angle2                = glGetUniformLocation(prog, "angle2");
     m_RenderData.pCurrentMonData->m_shBORDER1.gradientLerp          = glGetUniformLocation(prog, "gradientLerp");
     m_RenderData.pCurrentMonData->m_shBORDER1.alpha                 = glGetUniformLocation(prog, "alpha");
+    m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderTop         = glGetUniformLocation(prog, "drawBorderTop");
+    m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderBottom      = glGetUniformLocation(prog, "drawBorderBottom");
+    m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderLeft        = glGetUniformLocation(prog, "drawBorderLeft");
+    m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderRight       = glGetUniformLocation(prog, "drawBorderRight");
 
     m_RenderData.pCurrentMonData->m_bShadersInitialized = true;
 
@@ -2146,7 +2150,7 @@ void CHyprOpenGLImpl::renderTextureWithBlur(SP<CTexture> tex, const CBox& box, f
     scissor(nullptr);
 }
 
-void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& grad, int round, float roundingPower, int borderSize, float a, int outerRound) {
+void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& grad, int round, float roundingPower, int borderSize, float a, int outerRound, uint8_t drawnBordersMask) {
     RASSERT((box.width > 0 && box.height > 0), "Tried to render rect with width/height < 0!");
     RASSERT(m_RenderData.pMonitor, "Tried to render rect without begin()!");
 
@@ -2215,6 +2219,11 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     glEnableVertexAttribArray(m_RenderData.pCurrentMonData->m_shBORDER1.posAttrib);
     glEnableVertexAttribArray(m_RenderData.pCurrentMonData->m_shBORDER1.texAttrib);
 
+    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderTop, drawnBordersMask & DRAWN_BORDERS_TOP);
+    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderBottom, drawnBordersMask & DRAWN_BORDERS_BOTTOM);
+    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderLeft, drawnBordersMask & DRAWN_BORDERS_LEFT);
+    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderRight, drawnBordersMask & DRAWN_BORDERS_RIGHT);
+
     if (m_RenderData.clipBox.width != 0 && m_RenderData.clipBox.height != 0) {
         CRegion damageClip{m_RenderData.clipBox.x, m_RenderData.clipBox.y, m_RenderData.clipBox.width, m_RenderData.clipBox.height};
         damageClip.intersect(m_RenderData.damage);
@@ -2239,7 +2248,7 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
 }
 
 void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& grad1, const CGradientValueData& grad2, float lerp, int round, float roundingPower, int borderSize,
-                                   float a, int outerRound) {
+                                   float a, int outerRound, uint8_t drawnBordersMask) {
     RASSERT((box.width > 0 && box.height > 0), "Tried to render rect with width/height < 0!");
     RASSERT(m_RenderData.pMonitor, "Tried to render rect without begin()!");
 
@@ -2311,6 +2320,11 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
 
     glEnableVertexAttribArray(m_RenderData.pCurrentMonData->m_shBORDER1.posAttrib);
     glEnableVertexAttribArray(m_RenderData.pCurrentMonData->m_shBORDER1.texAttrib);
+
+    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderTop, drawnBordersMask & DRAWN_BORDERS_TOP);
+    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderBottom, drawnBordersMask & DRAWN_BORDERS_BOTTOM);
+    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderLeft, drawnBordersMask & DRAWN_BORDERS_LEFT);
+    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderRight, drawnBordersMask & DRAWN_BORDERS_RIGHT);
 
     if (m_RenderData.clipBox.width != 0 && m_RenderData.clipBox.height != 0) {
         CRegion damageClip{m_RenderData.clipBox.x, m_RenderData.clipBox.y, m_RenderData.clipBox.width, m_RenderData.clipBox.height};

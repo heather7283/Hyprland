@@ -149,6 +149,33 @@ void CHyprDwindleLayout::applyNodeDataToWindow(SDwindleNodeData* pNode, bool for
     PWINDOW->m_vSize     = nodeBox.size();
     PWINDOW->m_vPosition = nodeBox.pos();
 
+    static auto PHIDEBORDER = CConfigValue<Hyprlang::INT>("general:hide_edge_borders");
+    static auto PROUNDING   = CConfigValue<Hyprlang::INT>("decoration:rounding");
+
+    const bool  NOGAPSOUT = gapsOut.bottom == 0 && gapsOut.top == 0 && gapsOut.right == 0 && gapsOut.left == 0;
+
+    if (*PHIDEBORDER && NOGAPSOUT && !*PROUNDING) {
+        const auto BORDERSIZE = PWINDOW->getRealBorderSize();
+
+        if (DISPLAYTOP) {
+            PWINDOW->m_vPosition -= {0, BORDERSIZE};
+            PWINDOW->m_vSize += {0, BORDERSIZE};
+        }
+        if (DISPLAYLEFT) {
+            PWINDOW->m_vPosition -= {BORDERSIZE, 0};
+            PWINDOW->m_vSize += {BORDERSIZE, 0};
+        }
+        if (DISPLAYBOTTOM)
+            PWINDOW->m_vSize += {0, BORDERSIZE};
+        if (DISPLAYRIGHT)
+            PWINDOW->m_vSize += {BORDERSIZE, 0};
+
+        PWINDOW->m_eDrawnBorders =
+            (DISPLAYTOP ? 0 : DRAWN_BORDERS_TOP) | (DISPLAYBOTTOM ? 0 : DRAWN_BORDERS_BOTTOM) | (DISPLAYLEFT ? 0 : DRAWN_BORDERS_LEFT) | (DISPLAYRIGHT ? 0 : DRAWN_BORDERS_RIGHT);
+    } else {
+        PWINDOW->m_eDrawnBorders = 0xff;
+    }
+
     PWINDOW->updateWindowDecos();
 
     auto       calcPos  = PWINDOW->m_vPosition;

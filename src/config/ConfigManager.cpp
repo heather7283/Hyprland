@@ -406,6 +406,7 @@ CConfigManager::CConfigManager() {
 
     registerConfigVar("general:border_size", Hyprlang::INT{1});
     registerConfigVar("general:no_border_on_floating", Hyprlang::INT{0});
+    registerConfigVar("general:hide_edge_borders", Hyprlang::INT{0});
     registerConfigVar("general:gaps_in", Hyprlang::CConfigCustomValueType{configHandleGapSet, configHandleGapDestroy, "5"});
     registerConfigVar("general:gaps_out", Hyprlang::CConfigCustomValueType{configHandleGapSet, configHandleGapDestroy, "20"});
     registerConfigVar("general:gaps_workspaces", Hyprlang::INT{0});
@@ -424,7 +425,6 @@ CConfigManager::CConfigManager() {
     registerConfigVar("general:col.inactive_border", Hyprlang::CConfigCustomValueType{&configHandleGradientSet, configHandleGradientDestroy, "0xff444444"});
     registerConfigVar("general:col.nogroup_border", Hyprlang::CConfigCustomValueType{&configHandleGradientSet, configHandleGradientDestroy, "0xffffaaff"});
     registerConfigVar("general:col.nogroup_border_active", Hyprlang::CConfigCustomValueType{&configHandleGradientSet, configHandleGradientDestroy, "0xffff00ff"});
-
     registerConfigVar("misc:disable_hyprland_logo", Hyprlang::INT{0});
     registerConfigVar("misc:disable_splash_rendering", Hyprlang::INT{0});
     registerConfigVar("misc:col.splash", Hyprlang::INT{0x55ffffff});
