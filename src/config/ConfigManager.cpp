@@ -381,6 +381,7 @@ CConfigManager::CConfigManager() {
 
     m_pConfig->addConfigValue("general:border_size", Hyprlang::INT{1});
     m_pConfig->addConfigValue("general:no_border_on_floating", Hyprlang::INT{0});
+    m_pConfig->addConfigValue("general:hide_edge_borders", Hyprlang::INT{0});
     m_pConfig->addConfigValue("general:border_part_of_window", Hyprlang::INT{1});
     m_pConfig->addConfigValue("general:gaps_in", Hyprlang::CConfigCustomValueType{configHandleGapSet, configHandleGapDestroy, "5"});
     m_pConfig->addConfigValue("general:gaps_out", Hyprlang::CConfigCustomValueType{configHandleGapSet, configHandleGapDestroy, "20"});

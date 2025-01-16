@@ -64,6 +64,12 @@ class CShader {
     GLint brightness = -1;
     GLint noise      = -1;
 
+    // Borders
+    GLint drawBorderTop    = -1;
+    GLint drawBorderBottom = -1;
+    GLint drawBorderLeft   = -1;
+    GLint drawBorderRight  = -1;
+
     GLint getUniformLocation(const std::string&);
 
     void  destroy();
