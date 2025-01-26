@@ -2150,7 +2150,8 @@ void CHyprOpenGLImpl::renderTextureWithBlur(SP<CTexture> tex, const CBox& box, f
     scissor(nullptr);
 }
 
-void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& grad, int round, float roundingPower, int borderSize, float a, int outerRound, uint8_t drawnBordersMask) {
+void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& grad, int round, float roundingPower, int borderSize, float a, int outerRound,
+                                   uint8_t drawnBordersMask) {
     RASSERT((box.width > 0 && box.height > 0), "Tried to render rect with width/height < 0!");
     RASSERT(m_RenderData.pMonitor, "Tried to render rect without begin()!");
 
