@@ -2375,10 +2375,10 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     glEnableVertexAttribArray(m_shaders->m_shBORDER1.posAttrib);
     glEnableVertexAttribArray(m_shaders->m_shBORDER1.texAttrib);
 
-    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderTop, drawnBordersMask & DRAWN_BORDERS_TOP);
-    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderBottom, drawnBordersMask & DRAWN_BORDERS_BOTTOM);
-    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderLeft, drawnBordersMask & DRAWN_BORDERS_LEFT);
-    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderRight, drawnBordersMask & DRAWN_BORDERS_RIGHT);
+    glUniform1i(m_shaders->m_shBORDER1.drawBorderTop, drawnBordersMask & DRAWN_BORDERS_TOP);
+    glUniform1i(m_shaders->m_shBORDER1.drawBorderBottom, drawnBordersMask & DRAWN_BORDERS_BOTTOM);
+    glUniform1i(m_shaders->m_shBORDER1.drawBorderLeft, drawnBordersMask & DRAWN_BORDERS_LEFT);
+    glUniform1i(m_shaders->m_shBORDER1.drawBorderRight, drawnBordersMask & DRAWN_BORDERS_RIGHT);
 
     if (m_RenderData.clipBox.width != 0 && m_RenderData.clipBox.height != 0) {
         CRegion damageClip{m_RenderData.clipBox.x, m_RenderData.clipBox.y, m_RenderData.clipBox.width, m_RenderData.clipBox.height};
@@ -2477,10 +2477,10 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     glEnableVertexAttribArray(m_shaders->m_shBORDER1.posAttrib);
     glEnableVertexAttribArray(m_shaders->m_shBORDER1.texAttrib);
 
-    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderTop, drawnBordersMask & DRAWN_BORDERS_TOP);
-    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderBottom, drawnBordersMask & DRAWN_BORDERS_BOTTOM);
-    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderLeft, drawnBordersMask & DRAWN_BORDERS_LEFT);
-    glUniform1i(m_RenderData.pCurrentMonData->m_shBORDER1.drawBorderRight, drawnBordersMask & DRAWN_BORDERS_RIGHT);
+    glUniform1i(m_shaders->m_shBORDER1.drawBorderTop, drawnBordersMask & DRAWN_BORDERS_TOP);
+    glUniform1i(m_shaders->m_shBORDER1.drawBorderBottom, drawnBordersMask & DRAWN_BORDERS_BOTTOM);
+    glUniform1i(m_shaders->m_shBORDER1.drawBorderLeft, drawnBordersMask & DRAWN_BORDERS_LEFT);
+    glUniform1i(m_shaders->m_shBORDER1.drawBorderRight, drawnBordersMask & DRAWN_BORDERS_RIGHT);
 
     if (m_RenderData.clipBox.width != 0 && m_RenderData.clipBox.height != 0) {
         CRegion damageClip{m_RenderData.clipBox.x, m_RenderData.clipBox.y, m_RenderData.clipBox.width, m_RenderData.clipBox.height};
