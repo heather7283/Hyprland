@@ -76,6 +76,7 @@ void CHyprBorderDecoration::draw(PHLMONITOR pMonitor, float const& a) {
     const auto                      ROUNDINGPOWER    = m_window->roundingPower();
     const auto                      CORRECTIONOFFSET = (borderSize * (M_SQRT2 - 1) * std::max(2.0 - ROUNDINGPOWER, 0.0));
     const auto                      OUTERROUND       = ((ROUNDINGBASE + borderSize) - CORRECTIONOFFSET) * pMonitor->m_scale;
+    uint8_t                         drawnBorders  = m_window->m_eDrawnBorders;
 
     CBorderPassElement::SBorderData data;
     data.box           = windowBox;
@@ -85,6 +86,7 @@ void CHyprBorderDecoration::draw(PHLMONITOR pMonitor, float const& a) {
     data.roundingPower = ROUNDINGPOWER;
     data.a             = a;
     data.borderSize    = borderSize;
+    data.drawnBorders  = drawnBorders;
 
     if (ANIMATED) {
         data.hasGrad2 = true;
