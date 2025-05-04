@@ -442,6 +442,7 @@ CConfigManager::CConfigManager() {
 
     registerConfigVar("general:border_size", Hyprlang::INT{1});
     registerConfigVar("general:no_border_on_floating", Hyprlang::INT{0});
+    registerConfigVar("general:hide_edge_borders", Hyprlang::INT{0});
     registerConfigVar("general:gaps_in", Hyprlang::CConfigCustomValueType{configHandleGapSet, configHandleGapDestroy, "5"});
     registerConfigVar("general:gaps_out", Hyprlang::CConfigCustomValueType{configHandleGapSet, configHandleGapDestroy, "20"});
     registerConfigVar("general:gaps_workspaces", Hyprlang::INT{0});
