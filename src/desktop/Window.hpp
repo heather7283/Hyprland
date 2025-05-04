@@ -63,6 +63,13 @@ enum eSuppressEvents : uint8_t {
     SUPPRESS_FULLSCREEN_OUTPUT  = 1 << 4,
 };
 
+enum eDrawnBorders : uint8_t {
+    DRAWN_BORDERS_TOP    = 1 << 0,
+    DRAWN_BORDERS_BOTTOM = 1 << 1,
+    DRAWN_BORDERS_LEFT   = 1 << 2,
+    DRAWN_BORDERS_RIGHT  = 1 << 3,
+};
+
 class IWindowTransformer;
 
 struct SAlphaValue {
@@ -227,6 +234,9 @@ class CWindow {
     CGradientValueData m_realBorderColorPrevious = {0};
     PHLANIMVAR<float>  m_borderFadeAnimationProgress;
     PHLANIMVAR<float>  m_borderAngleAnimationProgress;
+
+    // whether to draw individual borders or not
+    uint8_t m_eDrawnBorders = 0xff;
 
     // Fade in-out
     PHLANIMVAR<float> m_alpha;
