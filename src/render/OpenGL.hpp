@@ -190,9 +190,10 @@ class CHyprOpenGLImpl {
     void renderTextureWithBlur(SP<CTexture>, const CBox&, float a, SP<CWLSurfaceResource> pSurface, int round = 0, float roundingPower = 2.0f, bool blockBlurOptimization = false,
                                float blurA = 1.f, float overallA = 1.f);
     void renderRoundedShadow(const CBox&, int round, float roundingPower, int range, const CHyprColor& color, float a = 1.0);
-    void renderBorder(const CBox&, const CGradientValueData&, int round, float roundingPower, int borderSize, float a = 1.0, int outerRound = -1 /* use round */);
+    void renderBorder(const CBox&, const CGradientValueData&, int round, float roundingPower, int borderSize, float a = 1.0, int outerRound = -1 /* use round */,
+                      uint8_t drawnBordersMask = 0xff);
     void renderBorder(const CBox&, const CGradientValueData&, const CGradientValueData&, float lerp, int round, float roundingPower, int borderSize, float a = 1.0,
-                      int outerRound = -1 /* use round */);
+                      int outerRound = -1 /* use round */, uint8_t drawnBordersMask = 0xff);
     void renderTextureMatte(SP<CTexture> tex, const CBox& pBox, CFramebuffer& matte);
 
     void setMonitorTransformEnabled(bool enabled);
