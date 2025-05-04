@@ -23,6 +23,12 @@ uniform float angle2;
 uniform float gradientLerp;
 uniform float alpha;
 
+// Whether to draw each border or not
+uniform bool drawBorderTop;
+uniform bool drawBorderBottom;
+uniform bool drawBorderLeft;
+uniform bool drawBorderRight;
+
 #include "rounding.glsl"
 #include "CM.glsl"
 
@@ -155,10 +161,10 @@ void main() {
     // now check for other shit
     if (!done) {
         // distance to all straight bb borders
-        float distanceT = originalPixCoord[1];
-        float distanceB = fullSizeUntransformed[1] - originalPixCoord[1];
-        float distanceL = originalPixCoord[0];
-        float distanceR = fullSizeUntransformed[0] - originalPixCoord[0];
+        float distanceT = drawBorderTop ? originalPixCoord[1] : 999999.0;
+        float distanceB = drawBorderBottom ? (fullSizeUntransformed[1] - originalPixCoord[1]) : 999999.0;
+        float distanceL = drawBorderLeft ? originalPixCoord[0] : 999999.0;
+        float distanceR = drawBorderRight ? (fullSizeUntransformed[0] - originalPixCoord[0]) : 999999.0;
 
         // get the smallest
         float smallest = min(min(distanceT, distanceB), min(distanceL, distanceR));
