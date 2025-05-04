@@ -1178,8 +1178,11 @@ bool CHyprOpenGLImpl::initShaders() {
         shaders->m_shBORDER1.uniformLocations[SHADER_ANGLE2]                  = glGetUniformLocation(prog, "angle2");
         shaders->m_shBORDER1.uniformLocations[SHADER_GRADIENT_LERP]           = glGetUniformLocation(prog, "gradientLerp");
         shaders->m_shBORDER1.uniformLocations[SHADER_ALPHA]                   = glGetUniformLocation(prog, "alpha");
+        shaders->m_shBORDER1.uniformLocations[SHADER_DRAW_BORDER_TOP]         = glGetUniformLocation(prog, "drawBorderTop");
+        shaders->m_shBORDER1.uniformLocations[SHADER_DRAW_BORDER_BOTTOM]      = glGetUniformLocation(prog, "drawBorderBottom");
+        shaders->m_shBORDER1.uniformLocations[SHADER_DRAW_BORDER_LEFT]        = glGetUniformLocation(prog, "drawBorderLeft");
+        shaders->m_shBORDER1.uniformLocations[SHADER_DRAW_BORDER_RIGHT]       = glGetUniformLocation(prog, "drawBorderRight");
         shaders->m_shBORDER1.createVao();
-
     } catch (const std::exception& e) {
         if (!m_shadersInitialized)
             throw e;
@@ -2265,7 +2268,8 @@ void CHyprOpenGLImpl::renderTextureWithBlur(SP<CTexture> tex, const CBox& box, f
     scissor(nullptr);
 }
 
-void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& grad, int round, float roundingPower, int borderSize, float a, int outerRound) {
+void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& grad, int round, float roundingPower, int borderSize, float a, int outerRound,
+                                   uint8_t drawnBordersMask) {
     RASSERT((box.width > 0 && box.height > 0), "Tried to render rect with width/height < 0!");
     RASSERT(m_renderData.pMonitor, "Tried to render rect without begin()!");
 
@@ -2311,6 +2315,10 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_ANGLE, (int)(grad.m_angle / (PI / 180.0)) % 360 * (PI / 180.0));
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_ALPHA, a);
     m_shaders->m_shBORDER1.setUniformInt(SHADER_GRADIENT2_LENGTH, 0);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_TOP, drawnBordersMask & DRAWN_BORDERS_TOP);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_BOTTOM, drawnBordersMask & DRAWN_BORDERS_BOTTOM);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_LEFT, drawnBordersMask & DRAWN_BORDERS_LEFT);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_RIGHT, drawnBordersMask & DRAWN_BORDERS_RIGHT);
 
     CBox transformedBox = newBox;
     transformedBox.transform(wlTransformToHyprutils(invertTransform(m_renderData.pMonitor->m_transform)), m_renderData.pMonitor->m_transformedSize.x,
@@ -2352,7 +2360,7 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
 }
 
 void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& grad1, const CGradientValueData& grad2, float lerp, int round, float roundingPower, int borderSize,
-                                   float a, int outerRound) {
+                                   float a, int outerRound, uint8_t drawnBordersMask) {
     RASSERT((box.width > 0 && box.height > 0), "Tried to render rect with width/height < 0!");
     RASSERT(m_renderData.pMonitor, "Tried to render rect without begin()!");
 
@@ -2417,6 +2425,10 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_RADIUS_OUTER, outerRound == -1 ? round : outerRound);
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_ROUNDING_POWER, roundingPower);
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_THICK, scaledBorderSize);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_TOP, drawnBordersMask & DRAWN_BORDERS_TOP);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_BOTTOM, drawnBordersMask & DRAWN_BORDERS_BOTTOM);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_LEFT, drawnBordersMask & DRAWN_BORDERS_LEFT);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_RIGHT, drawnBordersMask & DRAWN_BORDERS_RIGHT);
 
     glBindVertexArray(m_shaders->m_shBORDER1.uniformLocations[SHADER_SHADER_VAO]);
 

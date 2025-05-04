@@ -150,6 +150,26 @@ void CHyprDwindleLayout::applyNodeDataToWindow(SDwindleNodeData* pNode, bool for
     PWINDOW->m_size     = nodeBox.size();
     PWINDOW->m_position = nodeBox.pos();
 
+    // TODO: actually check the config option here instead of applying unconditionally?
+    if (!PWINDOW->m_isFloating) {
+        const auto BORDERSIZE = PWINDOW->getRealBorderSize();
+        if (DISPLAYTOP) {
+            PWINDOW->m_position -= {0, BORDERSIZE};
+            PWINDOW->m_size += {0, BORDERSIZE};
+        }
+        if (DISPLAYLEFT) {
+            PWINDOW->m_position -= {BORDERSIZE, 0};
+            PWINDOW->m_size += {BORDERSIZE, 0};
+        }
+        if (DISPLAYBOTTOM)
+            PWINDOW->m_size += {0, BORDERSIZE};
+        if (DISPLAYRIGHT)
+            PWINDOW->m_size += {BORDERSIZE, 0};
+
+        PWINDOW->m_eDrawnBorders =
+            (DISPLAYTOP ? 0 : DRAWN_BORDERS_TOP) | (DISPLAYBOTTOM ? 0 : DRAWN_BORDERS_BOTTOM) | (DISPLAYLEFT ? 0 : DRAWN_BORDERS_LEFT) | (DISPLAYRIGHT ? 0 : DRAWN_BORDERS_RIGHT);
+    }
+
     PWINDOW->updateWindowDecos();
 
     auto              calcPos  = PWINDOW->m_position;
