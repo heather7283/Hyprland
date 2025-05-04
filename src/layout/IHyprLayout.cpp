@@ -767,6 +767,8 @@ void IHyprLayout::changeWindowFloatingMode(PHLWINDOW pWindow) {
         pWindow->m_size     = wb.size();
         pWindow->m_position = wb.pos();
 
+        pWindow->m_eDrawnBorders = 0xff;
+
         g_pHyprRenderer->damageMonitor(pWindow->m_monitor.lock());
 
         pWindow->unsetWindowData(PRIORITY_LAYOUT);
