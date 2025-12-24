@@ -1245,8 +1245,11 @@ bool CHyprOpenGLImpl::initShaders() {
         shaders->m_shBORDER1.uniformLocations[SHADER_ANGLE2]                  = glGetUniformLocation(prog, "angle2");
         shaders->m_shBORDER1.uniformLocations[SHADER_GRADIENT_LERP]           = glGetUniformLocation(prog, "gradientLerp");
         shaders->m_shBORDER1.uniformLocations[SHADER_ALPHA]                   = glGetUniformLocation(prog, "alpha");
+        shaders->m_shBORDER1.uniformLocations[SHADER_DRAW_BORDER_TOP]         = glGetUniformLocation(prog, "drawBorderTop");
+        shaders->m_shBORDER1.uniformLocations[SHADER_DRAW_BORDER_BOTTOM]      = glGetUniformLocation(prog, "drawBorderBottom");
+        shaders->m_shBORDER1.uniformLocations[SHADER_DRAW_BORDER_LEFT]        = glGetUniformLocation(prog, "drawBorderLeft");
+        shaders->m_shBORDER1.uniformLocations[SHADER_DRAW_BORDER_RIGHT]       = glGetUniformLocation(prog, "drawBorderRight");
         shaders->m_shBORDER1.createVao();
-
     } catch (const std::exception& e) {
         if (!m_shadersInitialized)
             throw e;
@@ -2504,6 +2507,10 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_ANGLE, sc<int>(grad.m_angle / (std::numbers::pi / 180.0)) % 360 * (std::numbers::pi / 180.0));
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_ALPHA, data.a);
     m_shaders->m_shBORDER1.setUniformInt(SHADER_GRADIENT2_LENGTH, 0);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_TOP, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_TOP);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_BOTTOM, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_BOTTOM);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_LEFT, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_LEFT);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_RIGHT, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_RIGHT);
 
     CBox transformedBox = newBox;
     transformedBox.transform(Math::wlTransformToHyprutils(Math::invertTransform(m_renderData.pMonitor->m_transform)), m_renderData.pMonitor->m_transformedSize.x,
@@ -2607,6 +2614,10 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_RADIUS_OUTER, data.outerRound == -1 ? round : data.outerRound);
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_ROUNDING_POWER, data.roundingPower);
     m_shaders->m_shBORDER1.setUniformFloat(SHADER_THICK, scaledBorderSize);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_TOP, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_TOP);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_BOTTOM, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_BOTTOM);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_LEFT, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_LEFT);
+    m_shaders->m_shBORDER1.setUniformInt(SHADER_DRAW_BORDER_RIGHT, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_RIGHT);
 
     glBindVertexArray(m_shaders->m_shBORDER1.uniformLocations[SHADER_SHADER_VAO]);
 

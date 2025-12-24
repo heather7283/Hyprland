@@ -210,6 +210,7 @@ class CHyprOpenGLImpl {
         int   borderSize    = 1;
         float a             = 1.0;
         int   outerRound    = -1; /* use round */
+        uint8_t drawnBordersMask = 0xff;
     };
 
     void         begin(PHLMONITOR, const CRegion& damage, CFramebuffer* fb = nullptr, std::optional<CRegion> finalDamage = {});

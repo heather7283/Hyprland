@@ -61,6 +61,14 @@ namespace Desktop::View {
         SUPPRESS_FULLSCREEN_OUTPUT  = 1 << 4,
     };
 
+    enum eDrawnBorders : uint8_t {
+        DRAWN_BORDERS_TOP    = 1 << 0,
+        DRAWN_BORDERS_BOTTOM = 1 << 1,
+        DRAWN_BORDERS_LEFT   = 1 << 2,
+        DRAWN_BORDERS_RIGHT  = 1 << 3,
+        DRAWN_BORDERS_ALL    = 0xff,
+    };
+
     struct SInitialWorkspaceToken {
         PHLWINDOWREF primaryOwner;
         std::string  workspace;
@@ -170,6 +178,8 @@ namespace Desktop::View {
         CGradientValueData m_realBorderColorPrevious = {0};
         PHLANIMVAR<float>  m_borderFadeAnimationProgress;
         PHLANIMVAR<float>  m_borderAngleAnimationProgress;
+
+        uint8_t m_eDrawnBorders = DRAWN_BORDERS_ALL;
 
         // Fade in-out
         PHLANIMVAR<float> m_alpha;
