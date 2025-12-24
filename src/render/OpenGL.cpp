@@ -973,7 +973,6 @@ bool CHyprOpenGLImpl::initShaders() {
             if (!shaders->frag[desc.id]->createProgram(shaders->TEXVERTSRC, fragSrc, isDynamic))
                 return false;
         }
-
     } catch (const std::exception& e) {
         if (!m_shadersInitialized)
             throw e;
@@ -2247,6 +2246,10 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     shader->setUniformFloat(SHADER_ANGLE, sc<int>(grad.m_angle / (std::numbers::pi / 180.0)) % 360 * (std::numbers::pi / 180.0));
     shader->setUniformFloat(SHADER_ALPHA, data.a);
     shader->setUniformInt(SHADER_GRADIENT2_LENGTH, 0);
+    shader->setUniformInt(SHADER_DRAW_BORDER_TOP, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_TOP);
+    shader->setUniformInt(SHADER_DRAW_BORDER_BOTTOM, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_BOTTOM);
+    shader->setUniformInt(SHADER_DRAW_BORDER_LEFT, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_LEFT);
+    shader->setUniformInt(SHADER_DRAW_BORDER_RIGHT, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_RIGHT);
 
     CBox transformedBox = newBox;
     transformedBox.transform(Math::wlTransformToHyprutils(Math::invertTransform(m_renderData.pMonitor->m_transform)), m_renderData.pMonitor->m_transformedSize.x,
@@ -2351,6 +2354,10 @@ void CHyprOpenGLImpl::renderBorder(const CBox& box, const CGradientValueData& gr
     shader->setUniformFloat(SHADER_RADIUS_OUTER, data.outerRound == -1 ? round : data.outerRound);
     shader->setUniformFloat(SHADER_ROUNDING_POWER, data.roundingPower);
     shader->setUniformFloat(SHADER_THICK, scaledBorderSize);
+    shader->setUniformInt(SHADER_DRAW_BORDER_TOP, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_TOP);
+    shader->setUniformInt(SHADER_DRAW_BORDER_BOTTOM, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_BOTTOM);
+    shader->setUniformInt(SHADER_DRAW_BORDER_LEFT, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_LEFT);
+    shader->setUniformInt(SHADER_DRAW_BORDER_RIGHT, data.drawnBordersMask & Desktop::View::DRAWN_BORDERS_RIGHT);
 
     glBindVertexArray(shader->getUniformLocation(SHADER_SHADER_VAO));
 

@@ -805,6 +805,8 @@ void IHyprLayout::changeWindowFloatingMode(PHLWINDOW pWindow) {
         pWindow->m_size     = wb.size();
         pWindow->m_position = wb.pos();
 
+        pWindow->m_eDrawnBorders = Desktop::View::DRAWN_BORDERS_ALL;
+
         fitFloatingWindowOnMonitor(pWindow, wb);
 
         g_pHyprRenderer->damageMonitor(pWindow->m_monitor.lock());

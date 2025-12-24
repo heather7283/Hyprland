@@ -205,6 +205,11 @@ void CShader::getUniformLocations() {
     m_uniformLocations[SHADER_POINTER_INACTIVE_TIMEOUT]  = getUniform("pointer_inactive_timeout");
     m_uniformLocations[SHADER_POINTER_LAST_ACTIVE]       = getUniform("pointer_last_active");
     m_uniformLocations[SHADER_POINTER_SIZE]              = getUniform("pointer_size");
+
+    m_uniformLocations[SHADER_DRAW_BORDER_TOP]           = getUniform("drawBorderTop");
+    m_uniformLocations[SHADER_DRAW_BORDER_BOTTOM]        = getUniform("drawBorderBottom");
+    m_uniformLocations[SHADER_DRAW_BORDER_LEFT]          = getUniform("drawBorderLeft");
+    m_uniformLocations[SHADER_DRAW_BORDER_RIGHT]         = getUniform("drawBorderRight");
 }
 
 void CShader::createVao() {
