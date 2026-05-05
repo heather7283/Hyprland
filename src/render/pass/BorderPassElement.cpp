@@ -9,11 +9,11 @@ void CBorderPassElement::draw(const CRegion& damage) {
     if (m_data.hasGrad2)
         g_pHyprOpenGL->renderBorder(
             m_data.box, m_data.grad1, m_data.grad2, m_data.lerp,
-            {.round = m_data.round, .roundingPower = m_data.roundingPower, .borderSize = m_data.borderSize, .a = m_data.a, .outerRound = m_data.outerRound});
+            {.round = m_data.round, .roundingPower = m_data.roundingPower, .borderSize = m_data.borderSize, .a = m_data.a, .outerRound = m_data.outerRound, .drawnBordersMask = m_data.drawnBorders});
     else
         g_pHyprOpenGL->renderBorder(
             m_data.box, m_data.grad1,
-            {.round = m_data.round, .roundingPower = m_data.roundingPower, .borderSize = m_data.borderSize, .a = m_data.a, .outerRound = m_data.outerRound});
+            {.round = m_data.round, .roundingPower = m_data.roundingPower, .borderSize = m_data.borderSize, .a = m_data.a, .outerRound = m_data.outerRound, .drawnBordersMask = m_data.drawnBorders});
 }
 
 bool CBorderPassElement::needsLiveBlur() {
