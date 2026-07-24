@@ -1169,7 +1169,7 @@ int CWindow::getRealBorderSize() const {
     if (!m_borderSizeCacheDirty)
         return m_cachedBorderSize;
 
-    if ((m_workspace && Fullscreen::controller()->getFullscreenModes(m_self.lock()).internal == Fullscreen::FSMODE_FULLSCREEN) || !m_ruleApplicator->decorate().valueOrDefault()) {
+    if ((m_workspace && Fullscreen::controller()->getFullscreenModes(m_self.lock()).internal != Fullscreen::FSMODE_NONE) || !m_ruleApplicator->decorate().valueOrDefault()) {
         m_cachedBorderSize     = 0;
         m_borderSizeCacheDirty = false;
         return 0;

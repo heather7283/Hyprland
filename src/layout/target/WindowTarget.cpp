@@ -222,9 +222,26 @@ void CWindowTarget::updatePos(uint8_t flags) {
         }
     }
 
-    const auto RESERVED = m_window->getFullWindowReservedArea();
-    calcPos             = calcPos + RESERVED.topLeft;
-    calcSize            = calcSize - (RESERVED.topLeft + RESERVED.bottomRight);
+    const bool EDGELEFT   = STICKS(m_box.logicalBox.x, MONITOR_WORKAREA.x);
+    const bool EDGERIGHT  = STICKS(m_box.logicalBox.x + m_box.logicalBox.w, MONITOR_WORKAREA.x + MONITOR_WORKAREA.w);
+    const bool EDGETOP    = STICKS(m_box.logicalBox.y, MONITOR_WORKAREA.y);
+    const bool EDGEBOTTOM = STICKS(m_box.logicalBox.y + m_box.logicalBox.h, MONITOR_WORKAREA.y + MONITOR_WORKAREA.h);
+
+    const int BORDER_SIZE = m_window->getRealBorderSize();
+
+    auto RESERVED = m_window->getFullWindowReservedArea();
+
+    if (EDGELEFT)
+        RESERVED.topLeft.x = std::max(0.0, RESERVED.topLeft.x - BORDER_SIZE);
+    if (EDGERIGHT)
+        RESERVED.bottomRight.x = std::max(0.0, RESERVED.bottomRight.x - BORDER_SIZE);
+    if (EDGETOP && !m_window->getDecorationByType(DECORATION_GROUPBAR))
+        RESERVED.topLeft.y = std::max(0.0, RESERVED.topLeft.y - BORDER_SIZE);
+    if (EDGEBOTTOM)
+        RESERVED.bottomRight.y = std::max(0.0, RESERVED.bottomRight.y - BORDER_SIZE);
+
+    calcPos  = calcPos + RESERVED.topLeft;
+    calcSize = calcSize - (RESERVED.topLeft + RESERVED.bottomRight);
 
     Vector2D    availableSpace = calcSize;
 

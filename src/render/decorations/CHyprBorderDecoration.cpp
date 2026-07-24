@@ -1,10 +1,11 @@
 #include "CHyprBorderDecoration.hpp"
 #include "../../Compositor.hpp"
 #include "../../config/ConfigValue.hpp"
-#include "../../managers/eventLoop/EventLoopManager.hpp"
 #include "../../managers/fullscreen/FullscreenController.hpp"
-#include "../pass/BorderPassElement.hpp"
+#include "../pass/RectPassElement.hpp"
 #include "../Renderer.hpp"
+#include "../../layout/space/Space.hpp"
+#include "../../desktop/Workspace.hpp"
 #include "../../state/MonitorState.hpp"
 
 CHyprBorderDecoration::CHyprBorderDecoration(PHLWINDOW pWindow) : IHyprWindowDecoration(pWindow), m_window(pWindow) {
@@ -17,6 +18,11 @@ SDecorationPositioningInfo CHyprBorderDecoration::getPositioningInfo() {
 
     if (doesntWantBorders())
         m_extents = {{}, {}};
+
+    // When a group bar is present, the top border is never shown and must not
+    // take up layout space – the group bar replaces it entirely.
+    if (m_window->getDecorationByType(DECORATION_GROUPBAR))
+        m_extents.topLeft.y = 0;
 
     SDecorationPositioningInfo info;
     info.priority       = 10000;
@@ -53,49 +59,68 @@ void CHyprBorderDecoration::draw(PHLMONITOR pMonitor, float const& a) {
     if (m_assignedGeometry.width < m_extents.topLeft.x + 1 || m_assignedGeometry.height < m_extents.topLeft.y + 1)
         return;
 
-    CBox windowBox = assignedBoxGlobal().translate(-pMonitor->m_position + m_window->m_floatingOffset).expand(-m_window->getRealBorderSize()).scale(pMonitor->m_scale).round();
+    const int borderSize = m_window->getRealBorderSize();
+
+    CBox windowBox = assignedBoxGlobal()
+                         .translate(-pMonitor->m_position + m_window->m_floatingOffset)
+                         .expand(-borderSize)
+                         .scale(pMonitor->m_scale)
+                         .round();
 
     if (windowBox.width < 1 || windowBox.height < 1)
         return;
 
-    auto       grad     = m_window->m_realBorderColor;
-    const bool ANIMATED = m_window->m_borderFadeAnimationProgress->isBeingAnimated();
+    const auto borderCol  = m_window->m_realBorderColor;
+    const auto color      = borderCol.m_colors.empty() ? CHyprColor{0} : borderCol.m_colors[0];
+    const int  bs         = std::round(borderSize * pMonitor->m_scale);
 
-    if (m_window->m_borderAngleAnimationProgress->enabled()) {
-        grad.m_angle += m_window->m_borderAngleAnimationProgress->value() * M_PI * 2;
-        grad.m_angle = normalizeAngleRad(grad.m_angle);
-
-        // When borderangle is animated, it is counterintuitive to fade between inactive/active gradient angles.
-        // Instead we sync the angles to avoid fading between them and additionally rotating the border angle.
-        if (ANIMATED)
-            m_window->m_realBorderColorPrevious.m_angle = grad.m_angle;
+    // Determine which edges should be suppressed:
+    // - tiled windows touching a screen edge
+    // - top edge when a group bar is present (regardless of position)
+    // Floating windows keep borders on all four sides.
+    bool edgeL = false, edgeR = false, edgeT = false, edgeB = false;
+    if (!m_window->m_isFloating) {
+        if (const auto PWS = m_window->m_workspace; PWS && PWS->m_space) {
+            const auto SURFACE = m_window->getWindowMainSurfaceBox();
+            const auto WORK    = PWS->m_space->workArea();
+            edgeL = STICKS(SURFACE.x, WORK.x);
+            edgeR = STICKS(SURFACE.x + SURFACE.w, WORK.x + WORK.w);
+            edgeT = STICKS(SURFACE.y, WORK.y);
+            edgeB = STICKS(SURFACE.y + SURFACE.h, WORK.y + WORK.h);
+        }
+        // Group bar replaces the top border entirely.
+        if (m_window->getDecorationByType(DECORATION_GROUPBAR))
+            edgeT = true;
     }
 
-    int                             borderSize       = m_window->getRealBorderSize();
-    const auto                      ROUNDINGBASE     = m_window->rounding();
-    const auto                      ROUNDING         = ROUNDINGBASE * pMonitor->m_scale;
-    const auto                      ROUNDINGPOWER    = m_window->roundingPower();
-    const auto                      CORRECTIONOFFSET = (borderSize * (M_SQRT2 - 1) * std::max(2.0 - ROUNDINGPOWER, 0.0));
-    const auto                      OUTERROUND       = ((ROUNDINGBASE + borderSize) - CORRECTIONOFFSET) * pMonitor->m_scale;
-
-    CBorderPassElement::SBorderData data;
-    data.box           = windowBox;
-    data.grad1         = grad;
-    data.round         = ROUNDING;
-    data.outerRound    = OUTERROUND;
-    data.roundingPower = ROUNDINGPOWER;
-    data.a             = a;
-    data.borderSize    = borderSize;
-    data.window        = m_window;
-
-    if (ANIMATED) {
-        data.hasGrad2 = true;
-        data.grad1    = m_window->m_realBorderColorPrevious;
-        data.grad2    = grad;
-        data.lerp     = m_window->m_borderFadeAnimationProgress->value();
+    // Draw each visible side as a rectangle.  Vertical sides extend one
+    // borderSize past the top / bottom edges and horizontal sides extend
+    // one borderSize past the left / right edges so that corners are
+    // continuous (opaque, no rounding).
+    if (!edgeL) {
+        CRectPassElement::SRectData r;
+        r.box   = {windowBox.x - bs, windowBox.y - bs, bs, windowBox.h + 2 * bs};
+        r.color = color;
+        g_pHyprRenderer->addPassElement(makeUnique<CRectPassElement>(r));
     }
-
-    g_pHyprRenderer->addPassElement(makeUnique<CBorderPassElement>(data));
+    if (!edgeR) {
+        CRectPassElement::SRectData r;
+        r.box   = {windowBox.x + windowBox.w, windowBox.y - bs, bs, windowBox.h + 2 * bs};
+        r.color = color;
+        g_pHyprRenderer->addPassElement(makeUnique<CRectPassElement>(r));
+    }
+    if (!edgeT) {
+        CRectPassElement::SRectData r;
+        r.box   = {windowBox.x - bs, windowBox.y - bs, windowBox.w + 2 * bs, bs};
+        r.color = color;
+        g_pHyprRenderer->addPassElement(makeUnique<CRectPassElement>(r));
+    }
+    if (!edgeB) {
+        CRectPassElement::SRectData r;
+        r.box   = {windowBox.x - bs, windowBox.y + windowBox.h, windowBox.w + 2 * bs, bs};
+        r.color = color;
+        g_pHyprRenderer->addPassElement(makeUnique<CRectPassElement>(r));
+    }
 }
 
 eDecorationType CHyprBorderDecoration::getDecorationType() {
@@ -117,7 +142,7 @@ void CHyprBorderDecoration::updateWindow(PHLWINDOW) {
 }
 
 void CHyprBorderDecoration::damageEntire() {
-    if (!validMapped(m_window) || Fullscreen::controller()->getFullscreenModes(m_window.lock()).internal == Fullscreen::FSMODE_FULLSCREEN)
+    if (!validMapped(m_window) || Fullscreen::controller()->getFullscreenModes(m_window.lock()).internal != Fullscreen::FSMODE_NONE)
         return;
 
     const auto GLOBAL_BOX = assignedBoxGlobal();
